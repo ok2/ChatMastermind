@@ -6,8 +6,8 @@ import yaml
 import sys
 import argcomplete
 import argparse
-from .utils import terminal_width, pp, tags_completer, process_tags, display_chat
-from .storage import save_answers, create_chat
+from .utils import terminal_width, pp, process_tags, display_chat
+from .storage import save_answers, create_chat, get_tags
 from .api_client import ai, openai_api_key
 
 
@@ -23,7 +23,8 @@ def process_and_display_chat(args: argparse.Namespace,
                              ) -> tuple[list[dict[str, str]], str, list[str]]:
     tags = args.tags or []
     extags = args.extags or []
-    process_tags(config, tags, extags)
+    otags = args.output_tags or []
+    process_tags(tags, extags, otags)
 
     question_parts = []
     question_list = args.question if args.question is not None else []
@@ -58,6 +59,12 @@ def handle_question(args: argparse.Namespace,
     save_answers(question, answers, tags, otags)
     print("-" * terminal_width())
     print(f"Usage: {usage}")
+
+
+def tags_completer(prefix, parsed_args, **kwargs):
+    with open(parsed_args.config, 'r') as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+    return get_tags(config, prefix)
 
 
 def create_parser() -> argparse.ArgumentParser:

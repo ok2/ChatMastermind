@@ -113,9 +113,9 @@ class TestHandleQuestion(unittest.TestCase):
         open_mock = MagicMock()
         with patch("chatmastermind.storage.open", open_mock):
             handle_question(self.args, self.config, True)
-            mock_process_tags.assert_called_once_with(self.config,
-                                                      self.args.tags,
-                                                      self.args.extags)
+            mock_process_tags.assert_called_once_with(self.args.tags,
+                                                      self.args.extags,
+                                                      [])
             mock_create_chat.assert_called_once_with(self.question,
                                                      self.args.tags,
                                                      self.args.extags,

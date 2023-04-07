@@ -55,3 +55,18 @@ def create_chat(question: Optional[str],
     if question:
         append_message(chat, 'user', question)
     return chat
+
+
+def get_tags(config: Dict[str, Any], prefix: Optional[str]) -> List[str]:
+    result = []
+    for file in sorted(pathlib.Path(config['db']).iterdir()):
+        if file.suffix == '.yaml':
+            with open(file, 'r') as f:
+                data = yaml.load(f, Loader=yaml.FullLoader)
+            for tag in data.get('tags', []):
+                if prefix and len(prefix) > 0:
+                    if tag.startswith(prefix):
+                        result.append(tag)
+                else:
+                    result.append(tag)
+    return list(set(result))

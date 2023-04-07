@@ -1,6 +1,4 @@
 import shutil
-import yaml
-import pathlib
 from pprint import PrettyPrinter
 from typing import List, Dict
 
@@ -13,11 +11,19 @@ def pp(*args, **kwargs) -> None:
     return PrettyPrinter(width=terminal_width()).pprint(*args, **kwargs)
 
 
-def process_tags(config: dict, tags: list, extags: list) -> None:
-    print(f"Tags: {', '.join(tags)}")
-    if len(extags) > 0:
-        print(f"Excluding tags: {', '.join(extags)}")
-    print()
+def process_tags(tags: list[str], extags: list[str], otags: list[str]) -> None:
+    printed_messages = []
+
+    if tags:
+        printed_messages.append(f"Tags: {', '.join(tags)}")
+    if extags:
+        printed_messages.append(f"Excluding tags: {', '.join(extags)}")
+    if otags:
+        printed_messages.append(f"Output tags: {', '.join(otags)}")
+
+    if printed_messages:
+        print("\n".join(printed_messages))
+        print()
 
 
 def append_message(chat: List[Dict[str, str]],
@@ -46,20 +52,3 @@ def display_chat(chat, dump=False) -> None:
             print(message['content'])
         else:
             print(f"{message['role'].upper()}: {message['content']}")
-
-
-def tags_completer(prefix, parsed_args, **kwargs):
-    with open(parsed_args.config, 'r') as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
-    result = []
-    for file in sorted(pathlib.Path(config['db']).iterdir()):
-        if file.suffix == '.yaml':
-            with open(file, 'r') as f:
-                data = yaml.load(f, Loader=yaml.FullLoader)
-            for tag in data.get('tags', []):
-                if prefix and len(prefix) > 0:
-                    if tag.startswith(prefix):
-                        result.append(tag)
-                else:
-                    result.append(tag)
-    return list(set(result))

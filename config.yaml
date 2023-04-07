@@ -1,4 +1,4 @@
-system: |
+system: |-
   You are an coding assistent, you develop an application in Python, which automates conversation with AI and helps to store question+answer pairs with tags, and to compose relevant chat history for the next question.
 db: ./db/
 openai:

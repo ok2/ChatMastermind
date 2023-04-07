@@ -32,7 +32,7 @@ setup(
     test_suite="tests",
     entry_points={
         "console_scripts": [
-            "chatmastermind=chatmastermind.main:main",
+            "cmm=chatmastermind.main:main",
         ],
     },
 )

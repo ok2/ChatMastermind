@@ -17,10 +17,18 @@ You can install these requirements using `pip`:
 pip install -r requirements.txt
 ```
 
+## Installation
+
+You can install the package with the requirements using `pip`:
+
+```
+pip install .
+```
+
 ## Usage
 
 ```
-python main.py [-h] [-p PRINT | -q QUESTION | -D | -d] [-c CONFIG] [-m MAX_TOKENS] [-T TEMPERATURE] [-M MODEL] [-n NUMBER] [-t [TAGS [TAGS ...]]] [-e [EXTAGS [EXTAGS ...]]] [-o [OTAGS [OTAGS ...]]]
+cmm [-h] [-p PRINT | -q QUESTION | -D | -d] [-c CONFIG] [-m MAX_TOKENS] [-T TEMPERATURE] [-M MODEL] [-n NUMBER] [-t [TAGS [TAGS ...]]] [-e [EXTAGS [EXTAGS ...]]] [-o [OTAGS [OTAGS ...]]]
 ```
 
 ### Arguments
@@ -43,37 +51,37 @@ python main.py [-h] [-p PRINT | -q QUESTION | -D | -d] [-c CONFIG] [-m MAX_TOKEN
 1. Print the contents of a YAML file:
 
 ```
-python main.py -p example.yaml
+cmm -p example.yaml
 ```
 
 2. Ask a question:
 
 ```
-python main.py -q "What is the meaning of life?" -t philosophy -e religion
+cmm -q "What is the meaning of life?" -t philosophy -e religion
 ```
 
 3. Display the chat history as a Python structure:
 
 ```
-python main.py -D
+cmm -D
 ```
 
 4. Display the chat history as readable text:
 
 ```
-python main.py -d
+cmm -d
 ```
 
 5. Filter chat history by tags:
 
 ```
-python main.py -d -t tag1 tag2
+cmm -d -t tag1 tag2
 ```
 
 6. Exclude chat history by tags:
 
 ```
-python main.py -d -e tag3 tag4
+cmm -d -e tag3 tag4
 ```
 
 ## Configuration
@@ -96,7 +104,7 @@ The configuration file (`.config.yaml`) should contain the following fields:
 To activate autocompletion for tags, add the following line to your shell's configuration file (e.g., `.bashrc`, `.zshrc`, or `.profile`):
 
 ```
-eval "$(register-python-argcomplete chatmastermind)"
+eval "$(register-python-argcomplete cmm)"
 ```
 
 After adding this line, restart your shell or run `source <your-shell-config-file>` to enable autocompletion for the `chatmastermind` script.

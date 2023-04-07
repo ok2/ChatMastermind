@@ -3,7 +3,6 @@
 # vim: set fileencoding=utf-8 :
 
 import yaml
-import os
 import io
 import sys
 import shutil
@@ -155,16 +154,48 @@ def save_answers(question: str,
                       default_flow_style=False)
 
 
-def main(args: argparse.Namespace) -> int:
+def create_parser() -> argparse.ArgumentParser:
+    default_config = '.config.yaml'
+    parser = argparse.ArgumentParser(
+        description="ChatMastermind is a Python application that automates conversation with AI")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-p', '--print', help='YAML file to print')
+    group.add_argument('-q', '--question', help='Question to ask')
+    group.add_argument('-D', '--chat-dump', help="Print chat as Python structure", action='store_true')
+    group.add_argument('-d', '--chat', help="Print chat as readable text", action='store_true')
+    parser.add_argument('-c', '--config', help='Config file name.', default=default_config)
+    parser.add_argument('-m', '--max-tokens', help='Max tokens to use', type=int)
+    parser.add_argument('-T', '--temperature', help='Temperature to use', type=float)
+    parser.add_argument('-M', '--model', help='Model to use')
+    parser.add_argument('-n', '--number', help='Number of answers to produce', type=int, default=3)
+    tags_arg = parser.add_argument('-t', '--tags', nargs='*', help='List of tag names', metavar='TAGS')
+    tags_arg.completer = tags_completer  # type: ignore
+    extags_arg = parser.add_argument('-e', '--extags', nargs='*', help='List of tag names to exclude', metavar='EXTAGS')
+    extags_arg.completer = tags_completer  # type: ignore
+    otags_arg = parser.add_argument('-o', '--output-tags', nargs='*', help='List of output tag names, default is input', metavar='OTAGS')
+    otags_arg.completer = tags_completer  # type: ignore
+    argcomplete.autocomplete(parser)
+    return parser
+
+
+def main() -> int:
+    parser = create_parser()
+    args = parser.parse_args()
+
     with open(args.config, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+
     openai.api_key = config['openai']['api_key']
+
     if args.max_tokens:
         config['openai']['max_tokens'] = args.max_tokens
+
     if args.temperature:
         config['openai']['temperature'] = args.temperature
+
     if args.model:
         config['openai']['model'] = args.model
+
     if args.print:
         run_print_command(args, config)
     elif args.question:
@@ -173,6 +204,7 @@ def main(args: argparse.Namespace) -> int:
         process_and_display_chat(args, config, dump=True)
     elif args.chat:
         process_and_display_chat(args, config)
+
     return 0
 
 
@@ -194,52 +226,4 @@ def tags_completer(prefix, parsed_args, **kwargs):
 
 
 if __name__ == '__main__':
-    args_parser = argparse.ArgumentParser(description="Handle chats")
-    default_config = '.config.yaml'
-    group = args_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-p', '--print',
-                       help='YAML file to print')
-    group.add_argument('-q', '--question',
-                       help='Question to ask')
-    group.add_argument('-D', '--chat-dump',
-                       help="Print chat as Python structure",
-                       action='store_true')
-    group.add_argument('-d', '--chat',
-                       help="Print chat as readable text",
-                       action='store_true')
-    args_parser.add_argument('-c', '--config',
-                             help='Config file name.',
-                             default=default_config)
-    args_parser.add_argument('-m', '--max-tokens',
-                             help='Max tokens to use',
-                             type=int)
-    args_parser.add_argument('-T', '--temperature',
-                             help='Temperature to use',
-                             type=float)
-    args_parser.add_argument('-M', '--model',
-                             help='Model to use')
-    args_parser.add_argument('-n', '--number',
-                             help='Number of answers to produce',
-                             type=int,
-                             default=3)
-    tags_arg = args_parser.add_argument(
-        '-t', '--tags',
-        nargs='*',
-        help='List of tag names',
-        metavar='TAGS')
-    tags_arg.completer = tags_completer  # type: ignore
-    extags_arg = args_parser.add_argument(
-        '-e', '--extags',
-        nargs='*',
-        help='List of tag names to exclude',
-        metavar='EXTAGS')
-    extags_arg.completer = tags_completer  # type: ignore
-    otags_arg = args_parser.add_argument(
-        '-o', '--output-tags',
-        nargs='*',
-        help='List of output tag names, default is input',
-        metavar='OTAGS')
-    otags_arg.completer = tags_completer  # type: ignore
-    argcomplete.autocomplete(args_parser)
-    args = args_parser.parse_args()
-    sys.exit(main(args))
+    sys.exit(main())

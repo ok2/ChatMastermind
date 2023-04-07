@@ -8,15 +8,25 @@ from typing import List, Dict, Any, Optional
 def save_answers(question: str,
                  answers: list[str],
                  tags: list[str],
-                 otags: Optional[list[str]]
+                 otags: Optional[list[str]],
+                 config: Dict[str, Any]
                  ) -> None:
     wtags = otags or tags
-    for num, answer in enumerate(answers, start=1):
-        title = f'-- ANSWER {num} '
+    num, inum = 0, 0
+    next_fname = pathlib.Path(config['db']) / '.next'
+    try:
+        with open(next_fname, 'r') as f:
+            num = int(f.read())
+    except Exception:
+        pass
+    for answer in answers:
+        num += 1
+        inum += 1
+        title = f'-- ANSWER {inum} '
         title_end = '-' * (terminal_width() - len(title))
         print(f'{title}{title_end}')
         print(answer)
-        with open(f"{num:02d}.yaml", "w") as fd:
+        with open(f"{num:04d}.yaml", "w") as fd:
             with io.StringIO() as f:
                 yaml.dump({'question': question},
                           f,
@@ -32,6 +42,8 @@ def save_answers(question: str,
             yaml.dump({'tags': wtags},
                       fd,
                       default_flow_style=False)
+    with open(next_fname, 'w') as f:
+        f.write(f'{num}')
 
 
 def create_chat(question: Optional[str],

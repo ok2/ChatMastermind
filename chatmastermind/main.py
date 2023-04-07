@@ -56,7 +56,7 @@ def handle_question(args: argparse.Namespace,
     chat, question, tags = process_and_display_chat(args, config, dump)
     otags = args.output_tags or []
     answers, usage = ai(chat, config, args.number)
-    save_answers(question, answers, tags, otags)
+    save_answers(question, answers, tags, otags, config)
     print("-" * terminal_width())
     print(f"Usage: {usage}")
 

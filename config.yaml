@@ -1,0 +1,11 @@
+system: |
+  You are an coding assistent, you develop an application in Python, which automates conversation with AI and helps to store question+answer pairs with tags, and to compose relevant chat history for the next question.
+db: ./db/
+openai:
+  api_key: sk-XXX
+  model: gpt-4
+  temperature: 0.8
+  max_tokens: 2900
+  top_p: 1
+  frequency_penalty: 0
+  presence_penalty: 0

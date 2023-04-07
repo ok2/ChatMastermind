@@ -1,0 +1,62 @@
+question: |-
+  I want to start a Python project on github with the name ChatMastermind. Give me the full package structure with all the files required.
+answer: |-
+  To create a Python project on GitHub with the name "ChatMastermind", follow these steps:
+
+  1. Create a new repository on GitHub named "ChatMastermind".
+
+  2. Clone the repository to your local machine.
+
+  3. Now, let's create the package structure for the project. Here's a suggested package structure:
+
+  ```
+  ChatMastermind/
+  |-- .gitignore
+  |-- README.md
+  |-- LICENSE
+  |-- setup.py
+  |-- chatmastermind/
+      |-- __init__.py
+      |-- main.py
+      |-- api_client.py
+      |-- storage.py
+      |-- utils.py
+  |-- tests/
+      |-- __init__.py
+      |-- test_main.py
+      |-- test_api_client.py
+      |-- test_storage.py
+      |-- test_utils.py
+  |-- examples/
+      |-- example.py
+  |-- requirements.txt
+  ```
+
+  - `.gitignore`: Contains a list of files and directories that should be ignored by git.
+  - `README.md`: Documentation for your project.
+  - `LICENSE`: The license for your project.
+  - `setup.py`: Python package setup script.
+  - `chatmastermind`: The main package directory.
+  - `__init__.py`: Initialize the package.
+  - `main.py`: The main script to run the application.
+  - `api_client.py`: Handles conversation with the AI.
+  - `storage.py`: Manages storing question+answer pairs with tags.
+  - `utils.py`: Contains utility/helper functions.
+  - `tests`: Directory containing tests.
+  - `test_main.py`: Tests for the main script.
+  - `test_api_client.py`: Tests for the API client.
+  - `test_storage.py`: Tests for storage functions.
+  - `test_utils.py`: Tests for utility functions.
+  - `examples`: Directory containing example scripts.
+  - `example.py`: An example of how to use the package.
+  - `requirements.txt`: Lists the required packages for your project.
+
+  4. Create these files and directories in your local repository.
+
+  5. Add and commit the changes to the repository.
+
+  6. Push the changes to the remote repository on GitHub.
+
+  Now you have your Python project called "ChatMastermind" on GitHub with the package structure ready for development.
+tags:
+  - PackageStructure

@@ -3,10 +3,12 @@ import io
 import os
 import yaml
 import argparse
-import chatmastermind.main
-from chatmastermind.main import create_chat, ai, handle_question, save_answers
+from chatmastermind.utils import terminal_width
+from chatmastermind.main import create_parser, handle_question
+from chatmastermind.api_client import ai
+from chatmastermind.storage import create_chat, save_answers
 from unittest import mock
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
 
 class TestCreateChat(unittest.TestCase):
@@ -86,11 +88,13 @@ class TestCreateChat(unittest.TestCase):
 class TestHandleQuestion(unittest.TestCase):
 
     def setUp(self):
+        self.question = "test question"
         self.args = argparse.Namespace(
             tags=['tag1'],
             extags=['extag1'],
             output_tags=None,
-            question='test question',
+            question=[self.question],
+            source=None,
             number=3
         )
         self.config = {
@@ -100,20 +104,19 @@ class TestHandleQuestion(unittest.TestCase):
 
     @patch("chatmastermind.main.create_chat", return_value="test_chat")
     @patch("chatmastermind.main.process_tags")
-    @patch("chatmastermind.main.ai", return_value=(["answer1", "answer2", "answer3"],
-                                        "test_usage"))
-    @patch("chatmastermind.main.pp")
-    @patch("chatmastermind.main.print")
-    @patch("chatmastermind.main.yaml.dump")
+    @patch("chatmastermind.main.ai", return_value=(["answer1", "answer2", "answer3"], "test_usage"))
+    @patch("chatmastermind.utils.pp")
+    @patch("builtins.print")
+    @patch("chatmastermind.storage.yaml.dump")
     def test_handle_question(self, _, mock_print, mock_pp, mock_ai,
                              mock_process_tags, mock_create_chat):
         open_mock = MagicMock()
-        with patch("chatmastermind.main.open", open_mock):
+        with patch("chatmastermind.storage.open", open_mock):
             handle_question(self.args, self.config, True)
             mock_process_tags.assert_called_once_with(self.config,
                                                       self.args.tags,
                                                       self.args.extags)
-            mock_create_chat.assert_called_once_with(self.args.question,
+            mock_create_chat.assert_called_once_with(self.question,
                                                      self.args.tags,
                                                      self.args.extags,
                                                      self.config)
@@ -124,15 +127,14 @@ class TestHandleQuestion(unittest.TestCase):
             expected_calls = []
             for num, answer in enumerate(mock_ai.return_value[0], start=1):
                 title = f'-- ANSWER {num} '
-                title_end = '-' * (chatmastermind.main.terminal_width - len(title))
+                title_end = '-' * (terminal_width() - len(title))
                 expected_calls.append(((f'{title}{title_end}',),))
                 expected_calls.append(((answer,),))
-            expected_calls.append((("-" * chatmastermind.main.terminal_width,),))
+            expected_calls.append((("-" * terminal_width(),),))
             expected_calls.append(((f"Usage: {mock_ai.return_value[1]}",),))
-            open_mock.assert_has_calls([
-                mock.call(f"{num:02d}.yaml", "w") for num in range(1, 4)
-                ] + [mock.call().__enter__(),
-                     mock.call().__exit__(None, None, None)] * 3,
+            open_mock.assert_has_calls(
+                [mock.call(f"{num:02d}.yaml", "w") for num in range(1, 4)] + [
+                    mock.call().__enter__(), mock.call().__exit__(None, None, None)] * 3,
                 any_order=True)
             self.assertEqual(mock_print.call_args_list, expected_calls)
 
@@ -152,9 +154,9 @@ class TestSaveAnswers(unittest.TestCase):
 
     def test_save_answers(self):
         try:
-            self.assert_stdout(f"-- ANSWER 1 {'-'*(chatmastermind.main.terminal_width-12)}\n"
+            self.assert_stdout(f"-- ANSWER 1 {'-'*(terminal_width()-12)}\n"
                                "AI is Artificial Intelligence\n"
-                               f"-- ANSWER 2 {'-'*(chatmastermind.main.terminal_width-12)}\n"
+                               f"-- ANSWER 2 {'-'*(terminal_width()-12)}\n"
                                "AI is a simulation of human intelligence\n")
             for idx, answer in enumerate(self.answers, start=1):
                 with open(f"{idx:02d}.yaml", "r") as file:
@@ -198,3 +200,19 @@ class TestAI(unittest.TestCase):
         expected_result = (['response_text_1', 'response_text_2'],
                            {'tokens': 10})
         self.assertEqual(result, expected_result)
+
+
+class TestCreateParser(unittest.TestCase):
+    def test_create_parser(self):
+        with patch('argparse.ArgumentParser.add_mutually_exclusive_group') as mock_add_mutually_exclusive_group:
+            mock_group = Mock()
+            mock_add_mutually_exclusive_group.return_value = mock_group
+            parser = create_parser()
+            self.assertIsInstance(parser, argparse.ArgumentParser)
+            mock_add_mutually_exclusive_group.assert_called_once_with(required=True)
+            mock_group.add_argument.assert_any_call('-p', '--print', help='YAML file to print')
+            mock_group.add_argument.assert_any_call('-q', '--question', nargs='*', help='Question to ask')
+            mock_group.add_argument.assert_any_call('-D', '--chat-dump', help="Print chat as Python structure", action='store_true')
+            mock_group.add_argument.assert_any_call('-d', '--chat', help="Print chat as readable text", action='store_true')
+            self.assertTrue('.config.yaml' in parser.get_default('config'))
+            self.assertEqual(parser.get_default('number'), 3)

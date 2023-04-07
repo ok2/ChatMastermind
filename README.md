@@ -1,8 +1,8 @@
 # ChatMastermind
 
-ChatMastermind is a Python application that automates conversation with AI, stores question-answer pairs with tags, and composes a relevant chat history for the next question.
+ChatMastermind is a Python application that automates conversation with AI, stores question-answer pairs with tags, and composes relevant chat history for the next question.
 
-The project uses the OpenAI API to generate responses, and stores the data in YAML files. It also allows you to filter the chat history based on tags, and supports autocompletion for tags.
+The project uses the OpenAI API to generate responses and stores the data in YAML files. It also allows you to filter chat history based on tags and supports autocompletion for tags.
 
 ## Requirements
 
@@ -13,7 +13,7 @@ The project uses the OpenAI API to generate responses, and stores the data in YA
 
 You can install these requirements using `pip`:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
@@ -21,13 +21,13 @@ pip install -r requirements.txt
 
 You can install the package with the requirements using `pip`:
 
-```
+```bash
 pip install .
 ```
 
 ## Usage
 
-```
+```bash
 cmm [-h] [-p PRINT | -q QUESTION | -D | -d] [-c CONFIG] [-m MAX_TOKENS] [-T TEMPERATURE] [-M MODEL] [-n NUMBER] [-t [TAGS [TAGS ...]]] [-e [EXTAGS [EXTAGS ...]]] [-o [OTAGS [OTAGS ...]]]
 ```
 
@@ -50,37 +50,37 @@ cmm [-h] [-p PRINT | -q QUESTION | -D | -d] [-c CONFIG] [-m MAX_TOKENS] [-T TEMP
 
 1. Print the contents of a YAML file:
 
-```
+```bash
 cmm -p example.yaml
 ```
 
 2. Ask a question:
 
-```
+```bash
 cmm -q "What is the meaning of life?" -t philosophy -e religion
 ```
 
 3. Display the chat history as a Python structure:
 
-```
+```bash
 cmm -D
 ```
 
 4. Display the chat history as readable text:
 
-```
+```bash
 cmm -d
 ```
 
 5. Filter chat history by tags:
 
-```
+```bash
 cmm -d -t tag1 tag2
 ```
 
 6. Exclude chat history by tags:
 
-```
+```bash
 cmm -d -e tag3 tag4
 ```
 
@@ -103,13 +103,12 @@ The configuration file (`.config.yaml`) should contain the following fields:
 
 To activate autocompletion for tags, add the following line to your shell's configuration file (e.g., `.bashrc`, `.zshrc`, or `.profile`):
 
-```
+```bash
 eval "$(register-python-argcomplete cmm)"
 ```
 
-After adding this line, restart your shell or run `source <your-shell-config-file>` to enable autocompletion for the `chatmastermind` script.
+After adding this line, restart your shell or run `source <your-shell-config-file>` to enable autocompletion for the `cmm` script.
 
 ## License
 
 This project is licensed under the terms of the WTFPL License.
-

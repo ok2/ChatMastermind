@@ -24,7 +24,9 @@ def process_and_display_chat(args: argparse.Namespace,
     tags = args.tags or []
     extags = args.extags or []
     otags = args.output_tags or []
-    process_tags(tags, extags, otags)
+
+    if not args.only_source_code:
+        process_tags(tags, extags, otags)
 
     question_parts = []
     question_list = args.question if args.question is not None else []
@@ -45,7 +47,7 @@ def process_and_display_chat(args: argparse.Namespace,
     question = '\n\n'.join(question_parts)
 
     chat = create_chat(question, tags, extags, config)
-    display_chat(chat, dump)
+    display_chat(chat, dump, args.only_source_code)
     return chat, question, tags
 
 
@@ -82,6 +84,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument('-M', '--model', help='Model to use')
     parser.add_argument('-n', '--number', help='Number of answers to produce', type=int, default=3)
     parser.add_argument('-s', '--source', nargs='*', help='Source add content of a file to the query')
+    parser.add_argument('-S', '--only-source-code', help='Print only source code', action='store_true')
     tags_arg = parser.add_argument('-t', '--tags', nargs='*', help='List of tag names', metavar='TAGS')
     tags_arg.completer = tags_completer  # type: ignore
     extags_arg = parser.add_argument('-e', '--extags', nargs='*', help='List of tag names to exclude', metavar='EXTAGS')

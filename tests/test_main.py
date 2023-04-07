@@ -95,6 +95,7 @@ class TestHandleQuestion(unittest.TestCase):
             output_tags=None,
             question=[self.question],
             source=None,
+            only_source_code=False,
             number=3
         )
         self.config = {

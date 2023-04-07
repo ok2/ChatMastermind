@@ -40,15 +40,24 @@ def message_to_chat(message: Dict[str, str],
     append_message(chat, 'assistant', message['answer'])
 
 
-def display_chat(chat, dump=False) -> None:
+def display_chat(chat, dump=False, source_code=False) -> None:
     if dump:
         pp(chat)
         return
     for message in chat:
-        if message['role'] == 'user':
+        if message['role'] == 'user' and not source_code:
             print('-' * (terminal_width()))
         if len(message['content']) > terminal_width() - len(message['role']) - 2:
-            print(f"{message['role'].upper()}:")
-            print(message['content'])
-        else:
+            if not source_code:
+                print(f"{message['role'].upper()}:")
+            if source_code:
+                out = 0
+                for line in message['content'].splitlines():
+                    if line.strip().startswith('```'):
+                        out += 1
+                    elif out == 1:
+                        print(f"{line}")
+            else:
+                print(message['content'])
+        elif not source_code:
             print(f"{message['role'].upper()}: {message['content']}")
